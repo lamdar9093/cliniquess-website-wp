@@ -1,0 +1,56 @@
+services:
+  mariadb:
+    image: mariadb:11
+    container_name: cliniquess-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    volumes:
+      - cliniquess-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping -h localhost -uroot -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cliniquess-net
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cliniquess-app
+    restart: unless-stopped
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    environment:
+      DB_HOST: mariadb
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./wp-content/uploads:/var/www/clinique-website-wp/wp-content/uploads
+    networks:
+      - cliniquess-net
+      - traefik-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.cliniquess.rule=Host(`deve.cliniquess.ca`)"
+      - "traefik.http.routers.cliniquess.entrypoints=websecure"
+      - "traefik.http.routers.cliniquess.tls.certresolver=letsencrypt"
+      - "traefik.http.services.cliniquess.loadbalancer.server.port=80"
+
+volumes:
+  cliniquess-db-data:
+    driver: local
+
+networks:
+  cliniquess-net:
+    driver: bridge
+  traefik-net:
+    external: true
+    name: traefik-net
