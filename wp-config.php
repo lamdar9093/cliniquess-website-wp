@@ -18,15 +18,20 @@
  * @package WordPress
  */
 
+// Reverse proxy (Traefik) HTTPS detection
+if ( isset( $_SERVER['HTTP_X_FORWARDED_PROTO'] ) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https' ) {
+    $_SERVER['HTTPS'] = 'on';
+}
+
 // ** Database settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
-define( 'DB_NAME', getenv('DB_NAME') ?: 'clinique_db' );
+define( 'DB_NAME', getenv('DB_NAME') ?: 'cliniquess_db' );
 
 /** Database username */
-define( 'DB_USER', getenv('DB_USER') ?: 'tech_clinique' );
+define( 'DB_USER', getenv('DB_USER') ?: 'root' );
 
 /** Database password */
-define( 'DB_PASSWORD', getenv('DB_PASSWORD') ?: '' );
+define( 'DB_PASSWORD', getenv('DB_PASSWORD') ?: 'passer123' );
 
 /** Database hostname */
 define( 'DB_HOST', getenv('DB_HOST') ?: 'localhost' );
