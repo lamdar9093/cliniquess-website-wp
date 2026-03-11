@@ -18,10 +18,10 @@
  * @package WordPress
  */
 
-// Reverse proxy (Traefik) HTTPS detection
-if ( isset( $_SERVER['HTTP_X_FORWARDED_PROTO'] ) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https' ) {
-    $_SERVER['HTTPS'] = 'on';
-}
+// Behind Traefik reverse proxy - always HTTPS
+$_SERVER['HTTPS'] = 'on';
+define( 'WP_HOME', 'https://deve.cliniquess.ca' );
+define( 'WP_SITEURL', 'https://deve.cliniquess.ca' );
 
 // ** Database settings - You can get this info from your web host ** //
 /** The name of the database for WordPress */
